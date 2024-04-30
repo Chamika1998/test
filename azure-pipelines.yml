@@ -4,7 +4,7 @@
 # https://aka.ms/yaml
 
 trigger:
--none
+  - none
 
 pool:
   vmImage: 'windows-latest'
@@ -12,49 +12,41 @@ pool:
 variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  solution: '**/RoundTheCode.AzureTestProject.sln'
-  project: '**/RoundTheCode.AzureTestProject.csproj'
-
+  solution: '\*\*/RoundTheCode.AzureTestProject.sln'
+  project: '\*\*/RoundTheCode.AzureTestProject.csproj'
 
 steps:
--task: NuGetToolInstaller@1
-  name:'NuGetToolInstaller'
+- task: NuGetToolInstaller@1
+  name: 'NuGetToolInstaller'
   displayName: 'NuGet tool installer'
 
-
-
--task: NuGetCommand@2
-  name:'NuGetRestore'
+- task: NuGetCommand@2
+  name: 'NuGetRestore'
   displayName: 'NuGet restore packages'
   inputs:
-    command: 'restrore'
+    command: 'restore'
     restoreSolution: '$(solution)'
     feedToUse: 'select'
 
-
 - task: DotNetCoreCLI@2
-  name:'Tests'
+  name: 'Tests'
   displayName: 'Run tests'
   inputs:
     command: 'test'
     projects: '$(solution)'
     arguments: '--configuration $(BuildConfiguration)'
 
-
-
 - task: DotNetCoreCLI@2
-  name:'Publish'
+  name: 'Publish'
   displayName: 'Publish'
   inputs:
     command: 'publish'
     publishWebProjects: false
-    arguments: '--configuration $(BuildConfiguration)  --output $(Build.ArtifactStagingDirectory)'
-    zipAfterPublish: false'
-
-
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: 'false'
 
 - task: PublishBuildArtifacts@1
-  name:'PublishBuildArtifacts'
+  name: 'PublishBuildArtifacts'
   displayName: 'Publish Build Artifacts'
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
