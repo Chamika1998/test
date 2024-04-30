@@ -33,13 +33,7 @@ stages:
             - download: 'buildPipeline'
               name: 'Download_Build_Artifacts'
               artifact: 'AzureTestProject'
-            - task: IISWebAppManagementOnMachineGroup@0
-              name: 'StopIIS'
-              displayName: 'Stop IIS'
-              inputs:
-                IISDeploymentType: 'IISWebsite'
-                ActionIISWebsite: 'StopWebsite'
-                StartStopWebsiteName: '${{ variables.IISWebsiteName }}'
+
             - task: IISWebAppDeploymentOnMachineGroup@0
               name: 'DeployIIS'
               displayName: 'Deploy IIS'
