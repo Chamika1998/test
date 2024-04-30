@@ -22,29 +22,29 @@ stages:
     pool:
       vmImage: windows-latest
     jobs:
-    - deployment: DeployWebsite
-      displayName: 'Deploy website'
-      environment: 'Windows server 2022'
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - checkout: none
-            - download: 'buildPipeline'
-              name: 'Download_Build_Artifacts'
-              artifact: 'AzureTestProject'
+      - deployment: DeployWebsite
+        displayName: 'Deploy website'
+        environment: 'Windows server 2022'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: none
+                - download: 'buildpipeline'  # Potential typo fixed (single quotes)
+                  name: 'Download_Build_Artifacts'
+                  artifact: 'AzureTestProject'
 
-            - task: IISWebAppDeploymentOnMachineGroup@0
-              name: 'DeployIIS'
-              displayName: 'Deploy IIS'
-              inputs:
-                WebSiteName: '${{ variables.IISWebsiteName }}'
-                Package: '$(Pipeline.Workspace)\buildPipeline\AzureTestProject\RoundTheCode.AzureTestProject'
-                TakeAppOfflineFlag: true
-            - task: IISWebAppManagementOnMachineGroup@0
-              name: 'StartIIS'
-              displayName: 'Start IIS'
-              inputs:
-                IISDeploymentType: 'IISWebsite'
-                ActionIISWebsite: 'StartWebsite'
-                StartStopWebsiteName: '${{ variables.IISWebsiteName }}'
+                - task: IISWebAppDeploymentOnMachineGroup@0
+                  name: 'DeployIIS'
+                  displayName: 'Deploy IIS'
+                  inputs:
+                    WebSiteName: '{{ variables.IISWebsiteName }}'
+                    Package: '$(Pipeline.Workspace)\buildPipeline\AzureTestProject\WebApp.zip'
+                    TakeAppOfflineFlag: true
+                - task: IISWebAppManagementOnMachineGroup@0
+                  name: 'StartIIS'
+                  displayName: 'Start IIS'
+                  inputs:
+                    IISDeploymentType: 'IISWebsite'
+                    ActionIISWebsite: 'StartWebsite'
+                    StartStopWebsiteName: '{{ variables.IISWebsiteName }}'
