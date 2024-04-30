@@ -1,49 +1,37 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-  - none
+- main
 
 pool:
   vmImage: 'windows-latest'
 
 variables:
+  solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  solution: '\*\*/RoundTheCode.AzureTestProject.sln'
-  project: '\*\*/RoundTheCode.AzureTestProject.csproj'
 
 steps:
 - task: NuGetToolInstaller@1
-  name: 'NuGetToolInstaller'
-  displayName: 'NuGet tool installer'
 
 - task: NuGetCommand@2
-  name: 'NuGetRestore'
-  displayName: 'NuGet restore packages'
   inputs:
-    command: 'restore'
     restoreSolution: '$(solution)'
-    feedsToUse: 'select'
 
-- task: DotNetCoreCLI@2
-  name: 'Tests'
-  displayName: 'Run tests'
+- task: VSBuild@1
   inputs:
-    command: 'test'
-    projects: '$(solution)'
-    arguments: '--configuration $(BuildConfiguration)'
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
 
-- task: DotNetCoreCLI@2
-  name: 'Publish'
-  displayName: 'Publish'
+- task: VSTest@2
   inputs:
-    command: 'publish'
-    publishWebProjects: false
-    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-    zipAfterPublish: 'false'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
 
 - task: PublishBuildArtifacts@1
   name: 'PublishBuildArtifacts'
@@ -51,7 +39,4 @@ steps:
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'AzureTestProject'
-    publishLocation: 'Container'
-
-
-
+    publishLocation: 'Container'    
